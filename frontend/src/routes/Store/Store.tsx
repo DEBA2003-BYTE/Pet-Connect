@@ -256,7 +256,21 @@ export default function Store() {
             <Link key={product._id} to={`/store/product/${product._id}`} className="product-card">
               <div className="product-image">
                 {product.images && product.images.length > 0 ? (
-                  <img src={product.images[0]} alt={product.name} />
+                  <img 
+                    src={product.images[0]} 
+                    alt={product.name}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.style.display = 'none'
+                      const parent = target.parentElement
+                      if (parent && !parent.querySelector('.no-image')) {
+                        const placeholder = document.createElement('div')
+                        placeholder.className = 'no-image'
+                        placeholder.textContent = '📦'
+                        parent.appendChild(placeholder)
+                      }
+                    }}
+                  />
                 ) : (
                   <div className="no-image">📦</div>
                 )}

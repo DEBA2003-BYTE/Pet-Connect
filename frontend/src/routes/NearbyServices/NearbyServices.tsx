@@ -25,6 +25,7 @@ interface Service {
   website?: string
   isVerified: boolean
   rating?: number
+  source?: 'database' | 'osm' // Track where data came from
 }
 
 export default function NearbyServices() {
@@ -35,16 +36,13 @@ export default function NearbyServices() {
   const [searchQuery, setSearchQuery] = useState('')
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list')
   const [loading, setLoading] = useState(true)
+  const [fetchingWeb, setFetchingWeb] = useState(false)
+  const [webServicesCount, setWebServicesCount] = useState(0)
 
   const serviceTypes = [
     { value: 'ALL', label: 'All Services', icon: '🏥' },
     { value: 'VET', label: 'Veterinarian', icon: '🩺' },
-    { value: 'CLINIC_24X7', label: '24/7 Clinic', icon: '🏥' },
-    { value: 'GROOMER', label: 'Groomer', icon: '✂️' },
-    { value: 'TRAINER', label: 'Trainer', icon: '🎓' },
-    { value: 'PARK', label: 'Pet Park', icon: '🌳' },
-    { value: 'CAFE', label: 'Pet Café', icon: '☕' },
-    { value: 'BOARDING', label: 'Boarding', icon: '🏠' }
+    { value: 'CLINIC_24X7', label: '24/7 Clinic', icon: '🏥' }
   ]
 
   useEffect(() => {
@@ -85,14 +83,116 @@ export default function NearbyServices() {
   const fetchNearbyServices = async (lat: number, lng: number) => {
     setLoading(true)
     try {
+      // Fetch from database
       const { data } = await api.get(`/services/nearby?lat=${lat}&lng=${lng}&radius=10`)
       setServices(data)
       setFilteredServices(data)
+      
+      // Also fetch from web (OpenStreetMap)
+      fetchWebServices(lat, lng)
     } catch (error) {
       console.error('Failed to fetch services', error)
+      // Still try to fetch from web even if database fails
+      fetchWebServices(lat, lng)
     } finally {
       setLoading(false)
     }
+  }
+
+  const fetchWebServices = async (lat: number, lng: number) => {
+    setFetchingWeb(true)
+    try {
+      // Fetch veterinary clinics and animal hospitals from OpenStreetMap using Overpass API
+      const radius = 5000 // 5km radius
+      const overpassQuery = `
+        [out:json][timeout:25];
+        (
+          node["amenity"="veterinary"](around:${radius},${lat},${lng});
+          way["amenity"="veterinary"](around:${radius},${lat},${lng});
+          node["healthcare"="veterinary"](around:${radius},${lat},${lng});
+          way["healthcare"="veterinary"](around:${radius},${lat},${lng});
+          node["amenity"="animal_hospital"](around:${radius},${lat},${lng});
+          way["amenity"="animal_hospital"](around:${radius},${lat},${lng});
+        );
+        out center;
+      `
+
+      const response = await fetch('https://overpass-api.de/api/interpreter', {
+        method: 'POST',
+        body: overpassQuery
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch from Overpass API')
+      }
+
+      const data = await response.json()
+      
+      // Transform OSM data to our Service format
+      const webServices: Service[] = data.elements.map((element: any, index: number) => {
+        const lat = element.lat || element.center?.lat
+        const lon = element.lon || element.center?.lon
+        const tags = element.tags || {}
+        
+        // Determine if it's 24/7
+        const is24x7 = tags.opening_hours?.includes('24/7') || 
+                       tags.name?.toLowerCase().includes('24') ||
+                       tags.name?.toLowerCase().includes('emergency')
+
+        return {
+          _id: `osm-${element.id}`,
+          name: tags.name || tags['name:en'] || 'Veterinary Clinic',
+          type: is24x7 ? 'CLINIC_24X7' : 'VET',
+          location: {
+            coordinates: [lon, lat]
+          },
+          address: tags['addr:full'] || 
+                   `${tags['addr:street'] || ''} ${tags['addr:housenumber'] || ''}`.trim() ||
+                   tags['addr:city'] || 
+                   'Address not available',
+          phone: tags.phone || tags['contact:phone'],
+          website: tags.website || tags['contact:website'],
+          isVerified: false,
+          source: 'osm' as const
+        }
+      }).filter((service: Service) => 
+        service.location.coordinates[0] && service.location.coordinates[1]
+      )
+
+      // Merge with existing services (avoid duplicates)
+      setServices(prevServices => {
+        const combined = [...prevServices, ...webServices]
+        // Remove duplicates based on proximity (within 50 meters)
+        const unique = combined.filter((service, index, self) => {
+          return index === self.findIndex(s => {
+            const distance = calculateDistanceBetweenPoints(
+              service.location.coordinates,
+              s.location.coordinates
+            )
+            return distance < 0.05 // 50 meters
+          })
+        })
+        return unique
+      })
+
+      setWebServicesCount(webServices.length)
+      console.log(`✅ Fetched ${webServices.length} services from OpenStreetMap`)
+    } catch (error) {
+      console.error('Failed to fetch web services:', error)
+    } finally {
+      setFetchingWeb(false)
+    }
+  }
+
+  const calculateDistanceBetweenPoints = (coords1: [number, number], coords2: [number, number]) => {
+    const R = 6371 // Earth's radius in km
+    const dLat = (coords2[1] - coords1[1]) * Math.PI / 180
+    const dLon = (coords2[0] - coords1[0]) * Math.PI / 180
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(coords1[1] * Math.PI / 180) * Math.cos(coords2[1] * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2)
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+    return R * c
   }
 
   const calculateDistance = (coords: [number, number]) => {
@@ -114,19 +214,27 @@ export default function NearbyServices() {
     <div className="services-container">
       <div className="services-header">
         <h1>🏥 Nearby Pet Services</h1>
-        <div className="view-toggle">
-          <button 
-            className={`toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
-            onClick={() => setViewMode('list')}
-          >
-            📋 List
-          </button>
-          <button 
-            className={`toggle-btn ${viewMode === 'map' ? 'active' : ''}`}
-            onClick={() => setViewMode('map')}
-          >
-            🗺️ Map
-          </button>
+        <div className="header-info">
+          {fetchingWeb && (
+            <span className="fetching-badge">🌐 Fetching from web...</span>
+          )}
+          {webServicesCount > 0 && (
+            <span className="web-badge">✅ {webServicesCount} from OpenStreetMap</span>
+          )}
+          <div className="view-toggle">
+            <button 
+              className={`toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+              onClick={() => setViewMode('list')}
+            >
+              📋 List
+            </button>
+            <button 
+              className={`toggle-btn ${viewMode === 'map' ? 'active' : ''}`}
+              onClick={() => setViewMode('map')}
+            >
+              🗺️ Map
+            </button>
+          </div>
         </div>
       </div>
 
@@ -164,9 +272,14 @@ export default function NearbyServices() {
                     <div className="service-icon">{getTypeIcon(service.type)}</div>
                     <div className="service-info">
                       <h3>{service.name}</h3>
-                      {service.isVerified && (
-                        <span className="verified-badge">✓ Verified</span>
-                      )}
+                      <div className="badges">
+                        {service.isVerified && (
+                          <span className="verified-badge">✓ Verified</span>
+                        )}
+                        {service.source === 'osm' && (
+                          <span className="web-source-badge">🌐 Web</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   
@@ -221,6 +334,14 @@ export default function NearbyServices() {
                   <Marker 
                     key={service._id}
                     position={[service.location.coordinates[1], service.location.coordinates[0]]}
+                    eventHandlers={{
+                      click: () => {
+                        window.open(
+                          `https://www.google.com/maps/search/?api=1&query=${service.location.coordinates[1]},${service.location.coordinates[0]}`,
+                          '_blank'
+                        )
+                      }
+                    }}
                   >
                     <Popup>
                       <div className="service-popup">
@@ -230,6 +351,15 @@ export default function NearbyServices() {
                         {service.phone && <p><strong>Phone:</strong> {service.phone}</p>}
                         <p><strong>Distance:</strong> {calculateDistance(service.location.coordinates)} km</p>
                         {service.isVerified && <p className="verified">✓ Verified</p>}
+                        <button 
+                          className="open-maps-btn"
+                          onClick={() => window.open(
+                            `https://www.google.com/maps/search/?api=1&query=${service.location.coordinates[1]},${service.location.coordinates[0]}`,
+                            '_blank'
+                          )}
+                        >
+                          📍 Open in Google Maps
+                        </button>
                       </div>
                     </Popup>
                   </Marker>

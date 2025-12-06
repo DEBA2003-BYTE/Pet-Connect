@@ -19,6 +19,9 @@ export default function Layout() {
             {user?.role === 'SERVICE_PROVIDER' && (
               <Link to="/seller" className="seller-link">🏪 Seller</Link>
             )}
+            {user?.role === 'ADMIN' && (
+              <Link to="/admin" className="admin-link">🛡️ Admin</Link>
+            )}
             <Link to="/community">Community</Link>
             <Link to="/events">Events</Link>
             <Link to="/profile">Profile</Link>

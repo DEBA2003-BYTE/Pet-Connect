@@ -1,16 +1,20 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import { connectDB } from './config/db'
-import authRoutes from './routes/auth.routes'
-import userRoutes from './routes/user.routes'
-import rescueRoutes from './routes/rescue.routes'
-import servicesRoutes from './routes/services.routes'
-import lostFoundRoutes from './routes/lostFound.routes'
-import adoptionRoutes from './routes/adoption.routes'
-import mediaRoutes from './routes/media.routes'
-import storeRoutes from './routes/store.routes'
-import wishlistRoutes from './routes/wishlist.routes'
+import { connectDB } from './config/db.js'
+import authRoutes from './routes/auth.routes.js'
+import userRoutes from './routes/user.routes.js'
+import rescueRoutes from './routes/rescue.routes.js'
+import servicesRoutes from './routes/services.routes.js'
+import lostFoundRoutes from './routes/lostFound.routes.js'
+import adoptionRoutes from './routes/adoption.routes.js'
+import mediaRoutes from './routes/media.routes.js'
+import storeRoutes from './routes/store.routes.js'
+import wishlistRoutes from './routes/wishlist.routes.js'
+import adminRoutes from './routes/admin.routes.js'
+import communityRoutes from './routes/community.routes.js'
+import eventsRoutes from './routes/events.routes.js'
+import petsRoutes from './routes/pets.routes.js'
 
 dotenv.config()
 
@@ -32,6 +36,10 @@ app.use('/api/adoptions', adoptionRoutes)
 app.use('/api/media', mediaRoutes)
 app.use('/api/store', storeRoutes)
 app.use('/api/wishlist', wishlistRoutes)
+app.use('/api/admin', adminRoutes)
+app.use('/api/community', communityRoutes)
+app.use('/api/events', eventsRoutes)
+app.use('/api/pets', petsRoutes)
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', message: 'PetConnect API is running' })

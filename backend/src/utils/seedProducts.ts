@@ -14,7 +14,7 @@ const sampleProducts = [
     price: 799,
     discountPrice: 711,
     stock: 45,
-    images: ['https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=500', 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=500'],
+    images: ['https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=500&auto=format&fit=crop', 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=500&auto=format&fit=crop'],
     specifications: {
       brand: 'Drools',
       weight: '3kg',
@@ -39,7 +39,7 @@ const sampleProducts = [
     price: 649,
     discountPrice: 584,
     stock: 38,
-    images: ['https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=500', 'https://images.unsplash.com/photo-1591768575557-5973a0e90f8f?w=500'],
+    images: ['https://images.unsplash.com/photo-1611003228941-98852ba62227?w=500&auto=format&fit=crop', 'https://images.unsplash.com/photo-1591768575557-5973a0e90f8f?w=500&auto=format&fit=crop'],
     specifications: {
       brand: 'Whiskas',
       weight: '2kg',
@@ -61,7 +61,7 @@ const sampleProducts = [
     category: 'FOOD',
     price: 299,
     stock: 52,
-    images: ['https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=500'],
+    images: ['https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=500&auto=format&fit=crop'],
     specifications: {
       brand: 'Vitapol',
       weight: '1kg',
@@ -82,7 +82,7 @@ const sampleProducts = [
     category: 'TOYS',
     price: 499,
     stock: 67,
-    images: ['https://images.unsplash.com/photo-1535294435445-d7249524ef2e?w=500', 'https://images.unsplash.com/photo-1591856378301-5c3a7f2e4c8f?w=500'],
+    images: ['https://images.unsplash.com/photo-1535294435445-d7249524ef2e?w=500&auto=format&fit=crop', 'https://images.unsplash.com/photo-1591856378301-5c3a7f2e4c8f?w=500&auto=format&fit=crop'],
     specifications: {
       brand: 'Kong',
       material: 'Rubber',
@@ -100,7 +100,7 @@ const sampleProducts = [
     category: 'TOYS',
     price: 149,
     stock: 120,
-    images: ['https://images.unsplash.com/photo-1545249390-6bdfa286032f?w=500'],
+    images: ['https://images.unsplash.com/photo-1545249390-6bdfa286032f?w=500&auto=format&fit=crop'],
     specifications: {
       brand: 'PetPlay',
       material: 'Plush',
@@ -116,7 +116,7 @@ const sampleProducts = [
     category: 'TOYS',
     price: 199,
     stock: 89,
-    images: ['https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=500'],
+    images: ['https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=500&auto=format&fit=crop'],
     specifications: {
       brand: 'PetPlay',
       material: 'Rope',
@@ -134,7 +134,7 @@ const sampleProducts = [
     category: 'ACCESSORIES',
     price: 699,
     stock: 45,
-    images: ['https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=500', 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=500'],
+    images: ['https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=500&auto=format&fit=crop', 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=500&auto=format&fit=crop'],
     specifications: {
       brand: 'PetSafe',
       size: 'M',
@@ -152,7 +152,7 @@ const sampleProducts = [
     category: 'ACCESSORIES',
     price: 299,
     stock: 78,
-    images: ['https://images.unsplash.com/photo-1601758125946-6ec2ef64daf8?w=500'],
+    images: ['https://images.unsplash.com/photo-1601758125946-6ec2ef64daf8?w=500&auto=format&fit=crop'],
     specifications: {
       brand: 'PetSafe',
       size: '1.5m',
@@ -170,7 +170,7 @@ const sampleProducts = [
     price: 1299,
     discountPrice: 1039,
     stock: 23,
-    images: ['https://images.unsplash.com/photo-1615751072497-5f5169febe17?w=500', 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=500'],
+    images: ['https://images.unsplash.com/photo-1615751072497-5f5169febe17?w=500&auto=format&fit=crop', 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=500&auto=format&fit=crop'],
     specifications: {
       brand: 'ComfyPet',
       size: 'Medium',
@@ -190,7 +190,7 @@ const sampleProducts = [
     category: 'GROOMING',
     price: 225,
     stock: 95,
-    images: ['https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=500'],
+    images: ['https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=500&auto=format&fit=crop'],
     specifications: {
       brand: 'Himalaya',
       weight: '200ml',
@@ -207,7 +207,7 @@ const sampleProducts = [
     category: 'GROOMING',
     price: 159,
     stock: 112,
-    images: ['https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=500'],
+    images: ['https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=500&auto=format&fit=crop'],
     specifications: {
       brand: 'PetGroomer',
       material: 'Steel',
@@ -222,7 +222,7 @@ const sampleProducts = [
     category: 'GROOMING',
     price: 199,
     stock: 67,
-    images: ['https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=500'],
+    images: ['https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=500&auto=format&fit=crop'],
     specifications: {
       brand: 'PetGroomer',
       material: 'Steel',
@@ -239,7 +239,7 @@ const sampleProducts = [
     category: 'HEALTH',
     price: 349,
     stock: 58,
-    images: ['https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500'],
+    images: ['https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=500&auto=format&fit=crop'],
     specifications: {
       brand: 'PetHealth',
       weight: '60 tablets',
@@ -257,7 +257,7 @@ const sampleProducts = [
     category: 'HEALTH',
     price: 499,
     stock: 42,
-    images: ['https://images.unsplash.com/photo-1587559070757-f72a388eebe5?w=500'],
+    images: ['https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=500&auto=format&fit=crop'],
     specifications: {
       brand: 'PetHealth',
       weight: '1ml',
@@ -274,7 +274,7 @@ const sampleProducts = [
     category: 'HEALTH',
     price: 299,
     stock: 73,
-    images: ['https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=500'],
+    images: ['https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=500&auto=format&fit=crop'],
     specifications: {
       brand: 'PetHealth',
       weight: '100ml',
@@ -292,7 +292,7 @@ const sampleProducts = [
     category: 'TRAINING',
     price: 249,
     stock: 87,
-    images: ['https://images.unsplash.com/photo-1623387641168-d9803ddd3f35?w=500', 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=500'],
+    images: ['https://images.unsplash.com/photo-1623387641168-d9803ddd3f35?w=500&auto=format&fit=crop', 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=500&auto=format&fit=crop'],
     specifications: {
       brand: 'TrainRight',
       weight: '200g',
@@ -310,7 +310,7 @@ const sampleProducts = [
     category: 'TRAINING',
     price: 199,
     stock: 64,
-    images: ['https://images.unsplash.com/photo-1591769225440-811ad7d6eab3?w=500'],
+    images: ['https://images.unsplash.com/photo-1591769225440-811ad7d6eab3?w=500&auto=format&fit=crop'],
     specifications: {
       brand: 'TrainRight',
       material: 'Metal',
@@ -325,7 +325,7 @@ const sampleProducts = [
     category: 'TRAINING',
     price: 349,
     stock: 45,
-    images: ['https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500'],
+    images: ['https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500&auto=format&fit=crop'],
     specifications: {
       brand: 'TrainRight',
       petType: ['Dog']

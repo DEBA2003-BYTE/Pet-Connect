@@ -144,7 +144,18 @@ export default function ProductDetail() {
       <div className="product-detail-main">
         <div className="product-images">
           <div className="main-image">
-            <img src={product.images[selectedImage] || '/placeholder.png'} alt={product.name} />
+            {product.images && product.images.length > 0 ? (
+              <img 
+                src={product.images[selectedImage]} 
+                alt={product.name}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement
+                  target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23f0f0f0" width="400" height="400"/%3E%3Ctext fill="%23999" font-family="sans-serif" font-size="40" dy="10.5" font-weight="bold" x="50%25" y="50%25" text-anchor="middle"%3E📦%3C/text%3E%3C/svg%3E'
+                }}
+              />
+            ) : (
+              <div className="no-image" style={{ width: '100%', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f0f0', fontSize: '60px' }}>📦</div>
+            )}
             {product.stock < 5 && product.stock > 0 && (
               <div className="low-stock-alert">⚠️ Only {product.stock} left!</div>
             )}
@@ -157,6 +168,10 @@ export default function ProductDetail() {
                 alt={`${product.name} ${idx + 1}`}
                 className={selectedImage === idx ? 'active' : ''}
                 onClick={() => setSelectedImage(idx)}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement
+                  target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23f0f0f0" width="100" height="100"/%3E%3Ctext fill="%23999" font-family="sans-serif" font-size="30" dy="10.5" font-weight="bold" x="50%25" y="50%25" text-anchor="middle"%3E📦%3C/text%3E%3C/svg%3E'
+                }}
               />
             ))}
           </div>

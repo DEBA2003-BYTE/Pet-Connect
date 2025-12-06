@@ -12,6 +12,7 @@ export interface IUser extends Document {
     coordinates: [number, number]
   }
   isVerified: boolean
+  isBlocked: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -27,6 +28,7 @@ const UserSchema = new Schema<IUser>({
   },
   phone: String,
   city: String,
+  isBlocked: { type: Boolean, default: false },
   location: {
     type: { type: String, enum: ['Point'] },
     coordinates: { type: [Number] }

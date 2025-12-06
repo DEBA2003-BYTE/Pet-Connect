@@ -157,7 +157,6 @@ export default function LostFound() {
                     <option value="">Select type</option>
                     <option value="Dog">Dog</option>
                     <option value="Cat">Cat</option>
-                    <option value="Bird">Bird</option>
                     <option value="Other">Other</option>
                   </select>
                 </div>
@@ -272,7 +271,6 @@ export default function LostFound() {
             <option value="ALL">All</option>
             <option value="Dog">Dog</option>
             <option value="Cat">Cat</option>
-            <option value="Bird">Bird</option>
             <option value="Other">Other</option>
           </select>
         </div>
