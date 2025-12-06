@@ -10,6 +10,7 @@ import lostFoundRoutes from './routes/lostFound.routes'
 import adoptionRoutes from './routes/adoption.routes'
 import mediaRoutes from './routes/media.routes'
 import storeRoutes from './routes/store.routes'
+import wishlistRoutes from './routes/wishlist.routes'
 
 dotenv.config()
 
@@ -30,8 +31,9 @@ app.use('/api/lost-found', lostFoundRoutes)
 app.use('/api/adoptions', adoptionRoutes)
 app.use('/api/media', mediaRoutes)
 app.use('/api/store', storeRoutes)
+app.use('/api/wishlist', wishlistRoutes)
 
-app.get('/api/health', (req, res) => {
+app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', message: 'PetConnect API is running' })
 })
 

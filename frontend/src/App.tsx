@@ -14,6 +14,8 @@ import Community from './routes/Community/Community'
 import Events from './routes/Events/Events'
 import Profile from './routes/Profile/Profile'
 import Store from './routes/Store/Store'
+import ProductDetail from './routes/Store/ProductDetail'
+import SellerDashboard from './routes/Seller/SellerDashboard'
 
 function App() {
   return (
@@ -29,6 +31,8 @@ function App() {
           <Route path="/lost-found" element={<LostFound />} />
           <Route path="/adoptions" element={<Adoption />} />
           <Route path="/store" element={<Store />} />
+          <Route path="/store/product/:id" element={<ProductDetail />} />
+          <Route path="/seller" element={<SellerDashboard />} />
           <Route path="/community" element={<Community />} />
           <Route path="/events" element={<Events />} />
           <Route path="/profile" element={<Profile />} />

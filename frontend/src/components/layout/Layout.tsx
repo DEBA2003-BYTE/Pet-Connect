@@ -16,6 +16,9 @@ export default function Layout() {
             <Link to="/lost-found">Lost & Found</Link>
             <Link to="/adoptions">Adoptions</Link>
             <Link to="/store">Pet Store</Link>
+            {user?.role === 'SERVICE_PROVIDER' && (
+              <Link to="/seller" className="seller-link">🏪 Seller</Link>
+            )}
             <Link to="/community">Community</Link>
             <Link to="/events">Events</Link>
             <Link to="/profile">Profile</Link>

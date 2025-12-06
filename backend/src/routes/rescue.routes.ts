@@ -6,17 +6,43 @@ const router = Router()
 
 router.post('/', authMiddleware, async (req: AuthRequest, res) => {
   try {
-    const { animalType, injuryDescription, location, photos } = req.body
+    const { 
+      animalType, 
+      injuryDescription, 
+      severity,
+      location, 
+      address,
+      photos,
+      contactNumber,
+      safetyWarnings
+    } = req.body
+    
+    // Generate unique case number
+    const count = await RescueReport.countDocuments()
+    const caseNumber = `RC-${new Date().getFullYear()}-${String(count + 1).padStart(5, '0')}`
     
     const rescue = await RescueReport.create({
+      caseNumber,
       reporterId: req.userId,
       animalType,
       injuryDescription,
+      severity: severity || 'MODERATE',
       location: {
         type: 'Point',
         coordinates: location.coordinates
       },
-      photos: photos || []
+      address,
+      photos: photos || [],
+      contactNumber,
+      safetyWarnings: safetyWarnings || {
+        isAggressive: false,
+        onRoad: false,
+        isBleeding: false
+      },
+      statusHistory: [{
+        status: 'OPEN',
+        timestamp: new Date()
+      }]
     })
 
     res.status(201).json(rescue)

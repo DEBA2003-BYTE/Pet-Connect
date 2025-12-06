@@ -23,6 +23,19 @@ export default function Store() {
   const [category, setCategory] = useState<string>('ALL')
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
+  const [showFilters, setShowFilters] = useState(false)
+  const [suggestions, setSuggestions] = useState<string[]>([])
+  
+  const [filters, setFilters] = useState({
+    minPrice: '',
+    maxPrice: '',
+    brand: '',
+    ageGroup: '',
+    breedSize: '',
+    foodType: '',
+    material: '',
+    sort: 'newest'
+  })
 
   const categories = [
     { value: 'ALL', label: 'All Products', icon: '🛍️' },
@@ -36,12 +49,12 @@ export default function Store() {
 
   useEffect(() => {
     fetchProducts()
-  }, [category, search])
+  }, [category, search, filters])
 
   const fetchProducts = async () => {
     setLoading(true)
     try {
-      const params: any = {}
+      const params: any = { ...filters }
       if (category !== 'ALL') params.category = category
       if (search) params.search = search
 
@@ -52,6 +65,24 @@ export default function Store() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const fetchSuggestions = async (query: string) => {
+    if (query.length < 2) {
+      setSuggestions([])
+      return
+    }
+    try {
+      const { data } = await api.get(`/store/search/suggestions?q=${query}`)
+      setSuggestions(data.map((p: any) => p.name))
+    } catch (error) {
+      console.error('Failed to fetch suggestions', error)
+    }
+  }
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value)
+    fetchSuggestions(value)
   }
 
   const getDiscount = (price: number, discountPrice?: number) => {
@@ -67,14 +98,142 @@ export default function Store() {
       </div>
 
       <div className="store-search">
-        <input
-          type="text"
-          placeholder="Search for products..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="search-input"
-        />
+        <div className="search-wrapper">
+          <input
+            type="text"
+            placeholder="Search for products..."
+            value={search}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            className="search-input"
+          />
+          {suggestions.length > 0 && (
+            <div className="search-suggestions">
+              {suggestions.map((suggestion, idx) => (
+                <div
+                  key={idx}
+                  className="suggestion-item"
+                  onClick={() => {
+                    setSearch(suggestion)
+                    setSuggestions([])
+                  }}
+                >
+                  {suggestion}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <button className="filter-toggle" onClick={() => setShowFilters(!showFilters)}>
+          🔍 Filters & Sort
+        </button>
       </div>
+
+      {showFilters && (
+        <div className="filters-panel">
+          <div className="filter-group">
+            <label>Sort By</label>
+            <select value={filters.sort} onChange={(e) => setFilters({ ...filters, sort: e.target.value })}>
+              <option value="newest">Newly Added</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="rating">Top Rated</option>
+              <option value="bestseller">Bestselling</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label>Price Range</label>
+            <div className="price-inputs">
+              <input
+                type="number"
+                placeholder="Min"
+                value={filters.minPrice}
+                onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
+              />
+              <span>to</span>
+              <input
+                type="number"
+                placeholder="Max"
+                value={filters.maxPrice}
+                onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
+              />
+            </div>
+          </div>
+
+          {category === 'FOOD' && (
+            <>
+              <div className="filter-group">
+                <label>Food Type</label>
+                <select value={filters.foodType} onChange={(e) => setFilters({ ...filters, foodType: e.target.value })}>
+                  <option value="">All Types</option>
+                  <option value="Dry">Dry</option>
+                  <option value="Wet">Wet</option>
+                  <option value="Grain-free">Grain-free</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label>Age Group</label>
+                <select value={filters.ageGroup} onChange={(e) => setFilters({ ...filters, ageGroup: e.target.value })}>
+                  <option value="">All Ages</option>
+                  <option value="Puppy">Puppy</option>
+                  <option value="Adult">Adult</option>
+                  <option value="Senior">Senior</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label>Breed Size</label>
+                <select value={filters.breedSize} onChange={(e) => setFilters({ ...filters, breedSize: e.target.value })}>
+                  <option value="">All Sizes</option>
+                  <option value="Small">Small</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Large">Large</option>
+                </select>
+              </div>
+            </>
+          )}
+
+          {category === 'TOYS' && (
+            <div className="filter-group">
+              <label>Material</label>
+              <select value={filters.material} onChange={(e) => setFilters({ ...filters, material: e.target.value })}>
+                <option value="">All Materials</option>
+                <option value="Rubber">Rubber</option>
+                <option value="Foam">Foam</option>
+                <option value="Rope">Rope</option>
+                <option value="Plush">Plush</option>
+              </select>
+            </div>
+          )}
+
+          <div className="filter-group">
+            <label>Brand</label>
+            <input
+              type="text"
+              placeholder="Enter brand name"
+              value={filters.brand}
+              onChange={(e) => setFilters({ ...filters, brand: e.target.value })}
+            />
+          </div>
+
+          <button 
+            className="btn btn-secondary"
+            onClick={() => setFilters({
+              minPrice: '',
+              maxPrice: '',
+              brand: '',
+              ageGroup: '',
+              breedSize: '',
+              foodType: '',
+              material: '',
+              sort: 'newest'
+            })}
+          >
+            Clear Filters
+          </button>
+        </div>
+      )}
 
       <div className="category-filters">
         {categories.map(cat => (
