@@ -24,6 +24,7 @@ export default function Layout() {
             )}
             <Link to="/community">Community</Link>
             <Link to="/events">Events</Link>
+            <Link to="/feedback">Feedback</Link>
             <Link to="/profile">Profile</Link>
             <button onClick={logout} className="btn btn-primary">Logout</button>
           </div>

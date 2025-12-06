@@ -15,6 +15,7 @@ import adminRoutes from './routes/admin.routes.js'
 import communityRoutes from './routes/community.routes.js'
 import eventsRoutes from './routes/events.routes.js'
 import petsRoutes from './routes/pets.routes.js'
+import feedbackRoutes from './routes/feedback.routes.js'
 
 dotenv.config()
 
@@ -40,6 +41,7 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/community', communityRoutes)
 app.use('/api/events', eventsRoutes)
 app.use('/api/pets', petsRoutes)
+app.use('/api/feedback', feedbackRoutes)
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', message: 'PetConnect API is running' })

@@ -3,6 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose'
 export interface IRescueReport extends Document {
   caseNumber: string
   reporterId?: mongoose.Types.ObjectId
+  isAnonymous: boolean
   status: 'OPEN' | 'ACCEPTED' | 'IN_PROGRESS' | 'RESOLVED' | 'CANCELLED'
   animalType: string
   injuryDescription: string
@@ -36,6 +37,7 @@ export interface IRescueReport extends Document {
 const RescueReportSchema = new Schema<IRescueReport>({
   caseNumber: { type: String, required: true, unique: true },
   reporterId: { type: Schema.Types.ObjectId, ref: 'User' },
+  isAnonymous: { type: Boolean, default: false },
   status: { 
     type: String, 
     enum: ['OPEN', 'ACCEPTED', 'IN_PROGRESS', 'RESOLVED', 'CANCELLED'],

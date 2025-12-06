@@ -17,6 +17,7 @@ import Store from './routes/Store/Store'
 import ProductDetail from './routes/Store/ProductDetail'
 import SellerDashboard from './routes/Seller/SellerDashboard'
 import AdminDashboard from './routes/Admin/AdminDashboard'
+import Feedback from './routes/Feedback/Feedback'
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/community" element={<Community />} />
           <Route path="/events" element={<Events />} />
+          <Route path="/feedback" element={<Feedback />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
       </Routes>

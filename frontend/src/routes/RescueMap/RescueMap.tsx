@@ -12,6 +12,7 @@ interface RescueReport {
   injuryDescription: string
   severity: string
   status: string
+  isAnonymous: boolean
   location: {
     coordinates: [number, number]
   }
@@ -28,7 +29,7 @@ interface RescueReport {
     phone?: string
   }
   estimatedArrival?: string
-  reporterId: {
+  reporterId?: {
     name: string
     phone?: string
   }
@@ -491,7 +492,7 @@ export default function RescueMap() {
                 </div>
                 
                 <div className="rescue-footer">
-                  <span>👤 {rescue.reporterId?.name || 'Anonymous'}</span>
+                  <span>👤 {rescue.isAnonymous ? 'Anonymous' : (rescue.reporterId?.name || 'Anonymous')}</span>
                   {rescue.assignedTo && (
                     <span className="assigned-to">
                       🚑 {rescue.assignedTo.name}
@@ -531,7 +532,7 @@ export default function RescueMap() {
                   <h4>{rescue.animalType}</h4>
                   <p><strong>Status:</strong> {rescue.status}</p>
                   <p>{rescue.injuryDescription}</p>
-                  <p><strong>Reported by:</strong> {rescue.reporterId?.name || 'Anonymous'}</p>
+                  <p><strong>Reported by:</strong> {rescue.isAnonymous ? 'Anonymous' : (rescue.reporterId?.name || 'Anonymous')}</p>
                   <p><strong>Time:</strong> {new Date(rescue.createdAt).toLocaleString()}</p>
                 </div>
               </Popup>

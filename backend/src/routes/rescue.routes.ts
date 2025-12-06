@@ -14,7 +14,8 @@ router.post('/', authMiddleware, async (req: AuthRequest, res) => {
       address,
       photos,
       contactNumber,
-      safetyWarnings
+      safetyWarnings,
+      isAnonymous
     } = req.body
     
     // Generate unique case number
@@ -23,7 +24,8 @@ router.post('/', authMiddleware, async (req: AuthRequest, res) => {
     
     const rescue = await RescueReport.create({
       caseNumber,
-      reporterId: req.userId,
+      reporterId: isAnonymous ? undefined : req.userId,
+      isAnonymous: isAnonymous || false,
       animalType,
       injuryDescription,
       severity: severity || 'MODERATE',
