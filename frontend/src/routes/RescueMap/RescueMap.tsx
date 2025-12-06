@@ -127,7 +127,7 @@ export default function RescueMap() {
 
   const fetchNearbyRescues = async (lat: number, lng: number) => {
     try {
-      const { data } = await api.get(`/rescues/nearby?lat=${lat}&lng=${lng}&radius=10`)
+      const { data } = await api.get(`/rescues/nearby?lat=${lat}&lng=${lng}&radius=60`)
       setRescues(data)
     } catch (error) {
       console.error('Failed to fetch rescues', error)

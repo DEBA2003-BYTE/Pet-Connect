@@ -3,32 +3,37 @@
 ## Overview
 All major features now automatically sort content by distance from the user's current GPS location, showing nearest items first.
 
-## Features with Location Sorting
+## Features with Location Sorting (60km Radius)
 
 ### 1. **Rescue Map** 🚨
-- Already fetches nearby rescues within 10km radius
+- Fetches nearby rescues within 60km radius
 - Automatically centers on user's location
 - Shows rescue reports sorted by proximity
+- Only shows rescues within 60km
 
 ### 2. **Lost & Found** 🐾
-- Pets are sorted by distance from user
+- Pets filtered within 60km radius
+- Sorted by distance from user
 - Shows distance in km on each card
 - Nearest lost/found pets appear first
 
 ### 3. **Adoption Listings** ❤️
-- Adoption listings sorted by proximity
+- Listings filtered within 60km radius
+- Sorted by proximity
 - Distance displayed on each listing card
 - User's location automatically captured when creating listing
 
 ### 4. **Events** 🎉
-- Events sorted by distance from user
+- Events filtered within 60km radius
+- Sorted by distance from user
 - Distance shown on event cards
 - Helps users find nearby events easily
 
 ### 5. **Nearby Services** 🏥
-- Already location-based
-- Fetches services within radius
+- Services filtered within 60km radius
+- Fetches from database and OpenStreetMap
 - Shows veterinarians and clinics nearby
+- Sorted by distance
 
 ## How It Works
 
@@ -90,13 +95,22 @@ location: {
 }
 ```
 
+## 60km Radius Filter
+
+All features now filter content to show only items within 60km of the user's location:
+- Items beyond 60km are automatically hidden
+- Helps users focus on relevant, reachable content
+- Reduces clutter and improves user experience
+- Ensures practical distance for pet-related activities
+
 ## Future Enhancements
 
-- [ ] Add radius filter (5km, 10km, 25km, 50km)
+- [ ] Add adjustable radius filter (10km, 30km, 60km, 100km)
 - [ ] Show items on map view
 - [ ] Add "Near Me" quick filter button
 - [ ] Cache user location for session
 - [ ] Add manual location selection option
+- [ ] Show "No results within 60km" message when empty
 
 ## Testing
 

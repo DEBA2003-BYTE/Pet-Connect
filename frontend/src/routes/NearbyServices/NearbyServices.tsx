@@ -83,8 +83,8 @@ export default function NearbyServices() {
   const fetchNearbyServices = async (lat: number, lng: number) => {
     setLoading(true)
     try {
-      // Fetch from database
-      const { data } = await api.get(`/services/nearby?lat=${lat}&lng=${lng}&radius=10`)
+      // Fetch from database within 60km radius
+      const { data } = await api.get(`/services/nearby?lat=${lat}&lng=${lng}&radius=60`)
       setServices(data)
       setFilteredServices(data)
       
@@ -103,7 +103,7 @@ export default function NearbyServices() {
     setFetchingWeb(true)
     try {
       // Fetch veterinary clinics and animal hospitals from OpenStreetMap using Overpass API
-      const radius = 5000 // 5km radius
+      const radius = 60000 // 60km radius
       const overpassQuery = `
         [out:json][timeout:25];
         (
