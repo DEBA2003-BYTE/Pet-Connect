@@ -33,6 +33,15 @@ export default function Layout() {
       <main className="main-content">
         <Outlet />
       </main>
+      <footer className="footer">
+        <div className="container footer-content">
+          <p>Have questions or need help? Contact us at:</p>
+          <a href="mailto:petconnect@gmail.com" className="footer-email">
+            📧 petconnect@gmail.com
+          </a>
+          <p className="footer-copyright">© 2025 PetConnect. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
   )
 }
