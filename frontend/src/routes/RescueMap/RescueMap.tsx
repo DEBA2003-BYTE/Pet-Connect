@@ -3,6 +3,8 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaf
 import 'leaflet/dist/leaflet.css'
 import api from '../../services/api'
 import ImageUpload from '../../components/ImageUpload'
+import { useAuth } from '../../context/AuthContext'
+import { useUserLocation, sortByDistance } from '../../hooks/useUserLocation'
 import './RescueMap.css'
 
 interface RescueReport {
@@ -74,6 +76,8 @@ function LocationMarker({
 }
 
 export default function RescueMap() {
+  const { user } = useAuth()
+  const { location: gpsLocation } = useUserLocation()
   const [center, setCenter] = useState<[number, number]>([28.6139, 77.2090])
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null)
   const [rescues, setRescues] = useState<RescueReport[]>([])
@@ -267,6 +271,36 @@ export default function RescueMap() {
       case 'IN_PROGRESS': return '#3b82f6'
       case 'RESOLVED': return '#10b981'
       default: return '#6b7280'
+    }
+  }
+
+  const handleAcceptRescue = async (rescueId: string) => {
+    try {
+      await api.patch(`/rescues/${rescueId}/status`, { status: 'ACCEPTED' })
+      alert('✅ Rescue accepted! You can now proceed to the location.')
+      if (userLocation) {
+        fetchNearbyRescues(userLocation[0], userLocation[1])
+      }
+    } catch (error: any) {
+      alert(`❌ ${error.response?.data?.message || 'Failed to accept rescue'}`)
+    }
+  }
+
+  const handleResolveRescue = async (rescueId: string) => {
+    const notes = prompt('Please provide resolution notes:')
+    if (!notes) return
+
+    try {
+      await api.patch(`/rescues/${rescueId}/status`, { 
+        status: 'RESOLVED',
+        rescuerNotes: notes
+      })
+      alert('✅ Rescue marked as resolved! Thank you for your service.')
+      if (userLocation) {
+        fetchNearbyRescues(userLocation[0], userLocation[1])
+      }
+    } catch (error: any) {
+      alert(`❌ ${error.response?.data?.message || 'Failed to resolve rescue'}`)
     }
   }
 
@@ -504,6 +538,28 @@ export default function RescueMap() {
                 <span className="rescue-time">
                   {new Date(rescue.createdAt).toLocaleString()}
                 </span>
+
+                {/* Volunteer Actions */}
+                {user?.role === 'VOLUNTEER' && (
+                  <div className="volunteer-actions">
+                    {rescue.status === 'OPEN' && (
+                      <button 
+                        className="btn btn-accept"
+                        onClick={() => handleAcceptRescue(rescue._id)}
+                      >
+                        ✅ Accept Rescue
+                      </button>
+                    )}
+                    {(rescue.status === 'ACCEPTED' || rescue.status === 'IN_PROGRESS') && (
+                      <button 
+                        className="btn btn-resolve"
+                        onClick={() => handleResolveRescue(rescue._id)}
+                      >
+                        ✔️ Mark as Resolved
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
             {rescues.length === 0 && (

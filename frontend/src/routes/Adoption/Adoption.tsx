@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import api from '../../services/api'
+import ImageUpload from '../../components/ImageUpload'
+import { useUserLocation, sortByDistance, calculateDistance } from '../../hooks/useUserLocation'
 import './Adoption.css'
 
 interface AdoptionListing {
@@ -12,6 +14,9 @@ interface AdoptionListing {
   healthInfo: string
   vaccinationStatus: string
   photos: string[]
+  location?: {
+    coordinates: [number, number]
+  }
   status: 'AVAILABLE' | 'ON_HOLD' | 'ADOPTED'
   ngoId: {
     name: string
@@ -23,6 +28,7 @@ interface AdoptionListing {
 
 export default function Adoption() {
   const { user } = useAuth()
+  const { location: userLocation } = useUserLocation()
   const [listings, setListings] = useState<AdoptionListing[]>([])
   const [filteredListings, setFilteredListings] = useState<AdoptionListing[]>([])
   const [speciesFilter, setSpeciesFilter] = useState<string>('ALL')
@@ -38,8 +44,23 @@ export default function Adoption() {
     gender: '',
     healthInfo: '',
     vaccinationStatus: '',
-    photos: [] as string[]
+    photos: [] as string[],
+    location: userLocation && !userLocation.error ? {
+      coordinates: [userLocation.longitude, userLocation.latitude]
+    } : undefined
   })
+
+  // Update form location when user location is detected
+  useEffect(() => {
+    if (userLocation && !userLocation.error && !formData.location) {
+      setFormData(prev => ({
+        ...prev,
+        location: {
+          coordinates: [userLocation.longitude, userLocation.latitude]
+        }
+      }))
+    }
+  }, [userLocation])
 
   useEffect(() => {
     fetchListings()
@@ -52,17 +73,24 @@ export default function Adoption() {
       filtered = filtered.filter(l => l.species === speciesFilter)
     }
 
+    // Filter within 60km and sort by distance from user location
+    if (userLocation && !userLocation.error) {
+      filtered = sortByDistance(filtered, userLocation.latitude, userLocation.longitude, 60)
+    }
+
     setFilteredListings(filtered)
-  }, [listings, speciesFilter])
+  }, [listings, speciesFilter, userLocation])
 
   const fetchListings = async () => {
     setLoading(true)
     try {
       const { data } = await api.get('/adoptions')
+      console.log('Fetched adoptions:', data)
       setListings(data)
       setFilteredListings(data)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch adoption listings', error)
+      console.error('Error details:', error.response?.data)
     } finally {
       setLoading(false)
     }
@@ -83,7 +111,10 @@ export default function Adoption() {
         gender: '',
         healthInfo: '',
         vaccinationStatus: '',
-        photos: []
+        photos: [],
+        location: userLocation && !userLocation.error ? {
+          coordinates: [userLocation.longitude, userLocation.latitude]
+        } : undefined
       })
       fetchListings()
     } catch (error: any) {
@@ -99,7 +130,7 @@ export default function Adoption() {
     setLoading(true)
     try {
       await api.post(`/adoptions/${selectedListing}/apply`, { message: applicationMessage })
-      alert('Application submitted successfully! The NGO will contact you soon.')
+      alert('Application submitted successfully! The owner will contact you soon.')
       setShowApplicationModal(false)
       setApplicationMessage('')
       setSelectedListing(null)
@@ -130,19 +161,19 @@ export default function Adoption() {
     <div className="adoption-container">
       <div className="adoption-header">
         <h1>❤️ Adoption Listings</h1>
-        {isNGO && (
+        {user && (
           <button 
             className="btn btn-primary"
             onClick={() => setShowForm(!showForm)}
           >
-            {showForm ? 'Cancel' : '+ Create Listing'}
+            {showForm ? 'Cancel' : '+ Add Pet for Adoption'}
           </button>
         )}
       </div>
 
-      {showForm && isNGO && (
+      {showForm && user && (
         <div className="adoption-form-card">
-          <h2>Create Adoption Listing</h2>
+          <h2>{isNGO ? 'Create Adoption Listing' : 'Add Your Pet for Adoption'}</h2>
           <form onSubmit={handleSubmit} className="adoption-form">
             <div className="form-row">
               <div className="form-group">
@@ -221,8 +252,34 @@ export default function Adoption() {
               />
             </div>
 
+            <div className="form-group">
+              <label>Photos</label>
+              <ImageUpload
+                onUploadComplete={(url) => setFormData({ ...formData, photos: [...formData.photos, url] })}
+                folder="adoptions"
+                maxFiles={5}
+                currentImages={formData.photos}
+              />
+              {formData.photos.length > 0 && (
+                <div className="uploaded-images">
+                  {formData.photos.map((photo, index) => (
+                    <div key={index} className="uploaded-image">
+                      <img src={photo} alt={`Upload ${index + 1}`} />
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, photos: formData.photos.filter((_, i) => i !== index) })}
+                        className="remove-image"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? 'Creating...' : 'Create Listing'}
+              {loading ? 'Submitting...' : 'Submit for Adoption'}
             </button>
           </form>
         </div>
@@ -236,7 +293,7 @@ export default function Adoption() {
               <button className="close-btn" onClick={() => setShowApplicationModal(false)}>✕</button>
             </div>
             <div className="modal-body">
-              <p>Tell the NGO why you'd like to adopt this pet and about your living situation:</p>
+              <p>Tell the owner why you'd like to adopt this pet and about your living situation:</p>
               <textarea
                 value={applicationMessage}
                 onChange={(e) => setApplicationMessage(e.target.value)}
@@ -303,8 +360,16 @@ export default function Adoption() {
                   <p><strong>Gender:</strong> {listing.gender}</p>
                   <p><strong>Health:</strong> {listing.healthInfo}</p>
                   <p><strong>Vaccination:</strong> {listing.vaccinationStatus}</p>
+                  {userLocation && !userLocation.error && listing.location?.coordinates && (
+                    <p><strong>📍 Distance:</strong> {calculateDistance(
+                      userLocation.latitude,
+                      userLocation.longitude,
+                      listing.location.coordinates[1],
+                      listing.location.coordinates[0]
+                    ).toFixed(1)} km away</p>
+                  )}
                   <p className="ngo-info">
-                    <strong>NGO:</strong> {listing.ngoId?.name}
+                    <strong>Owner:</strong> {listing.ngoId?.name}
                   </p>
                 </div>
 
@@ -318,7 +383,7 @@ export default function Adoption() {
                     </button>
                     {listing.ngoId?.phone && (
                       <a href={`tel:${listing.ngoId.phone}`} className="btn btn-secondary btn-full">
-                        📞 Contact NGO
+                        📞 Contact Owner
                       </a>
                     )}
                   </div>

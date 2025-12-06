@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import RescueReport from '../models/RescueReport'
-import { authMiddleware, AuthRequest } from '../middlewares/auth.middleware'
+import RescueReport from '../models/RescueReport.js'
+import { authMiddleware, type AuthRequest } from '../middlewares/auth.middleware.js'
 
 const router = Router()
 
@@ -91,17 +91,48 @@ router.get('/:id', async (req, res) => {
   }
 })
 
-router.patch('/:id', authMiddleware, async (req: AuthRequest, res) => {
+router.patch('/:id/status', authMiddleware, async (req: AuthRequest, res) => {
   try {
-    const { status, assignedTo } = req.body
+    const { status, rescuerNotes } = req.body
     
-    const rescue = await RescueReport.findByIdAndUpdate(
-      req.params.id,
-      { status, assignedTo, ...(status === 'RESOLVED' && { resolvedAt: new Date() }) },
-      { new: true }
-    )
+    const rescue = await RescueReport.findById(req.params.id)
+    if (!rescue) {
+      return res.status(404).json({ message: 'Rescue not found' })
+    }
 
-    res.json(rescue)
+    // Update status
+    rescue.status = status
+    
+    // If accepting, assign to current user
+    if (status === 'ACCEPTED') {
+      const mongoose = await import('mongoose')
+      rescue.assignedTo = new mongoose.Types.ObjectId(req.userId)
+    }
+    
+    // If resolving, add notes and timestamp
+    if (status === 'RESOLVED') {
+      rescue.resolvedAt = new Date()
+      if (rescuerNotes) {
+        rescue.rescuerNotes = rescuerNotes
+      }
+    }
+    
+    // Add to status history
+    const mongoose = await import('mongoose')
+    rescue.statusHistory.push({
+      status,
+      timestamp: new Date(),
+      updatedBy: new mongoose.Types.ObjectId(req.userId),
+      notes: rescuerNotes
+    })
+    
+    await rescue.save()
+    
+    const populatedRescue = await RescueReport.findById(rescue._id)
+      .populate('reporterId', 'name phone')
+      .populate('assignedTo', 'name phone')
+    
+    res.json(populatedRescue)
   } catch (error) {
     res.status(500).json({ message: 'Server error', error })
   }

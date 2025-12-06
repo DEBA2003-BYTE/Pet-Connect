@@ -12,6 +12,7 @@ interface Product {
   discountPrice?: number
   stock: number
   images: string[]
+  salesCount?: number
   ratings: {
     average: number
     count: number
@@ -134,86 +135,31 @@ export default function Store() {
             <label>Sort By</label>
             <select value={filters.sort} onChange={(e) => setFilters({ ...filters, sort: e.target.value })}>
               <option value="newest">Newly Added</option>
+              <option value="trending">🔥 Trending</option>
+              <option value="bestseller">Bestselling</option>
+              <option value="rating">Top Rated</option>
               <option value="price-asc">Price: Low to High</option>
               <option value="price-desc">Price: High to Low</option>
-              <option value="rating">Top Rated</option>
-              <option value="bestseller">Bestselling</option>
             </select>
           </div>
 
           <div className="filter-group">
-            <label>Price Range</label>
-            <div className="price-inputs">
-              <input
-                type="number"
-                placeholder="Min"
-                value={filters.minPrice}
-                onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
-              />
-              <span>to</span>
-              <input
-                type="number"
-                placeholder="Max"
-                value={filters.maxPrice}
-                onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
-              />
-            </div>
+            <label>Min Price</label>
+            <input
+              type="number"
+              placeholder="Min Price"
+              value={filters.minPrice}
+              onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
+            />
           </div>
 
-          {category === 'FOOD' && (
-            <>
-              <div className="filter-group">
-                <label>Food Type</label>
-                <select value={filters.foodType} onChange={(e) => setFilters({ ...filters, foodType: e.target.value })}>
-                  <option value="">All Types</option>
-                  <option value="Dry">Dry</option>
-                  <option value="Wet">Wet</option>
-                  <option value="Grain-free">Grain-free</option>
-                </select>
-              </div>
-
-              <div className="filter-group">
-                <label>Age Group</label>
-                <select value={filters.ageGroup} onChange={(e) => setFilters({ ...filters, ageGroup: e.target.value })}>
-                  <option value="">All Ages</option>
-                  <option value="Puppy">Puppy</option>
-                  <option value="Adult">Adult</option>
-                  <option value="Senior">Senior</option>
-                </select>
-              </div>
-
-              <div className="filter-group">
-                <label>Breed Size</label>
-                <select value={filters.breedSize} onChange={(e) => setFilters({ ...filters, breedSize: e.target.value })}>
-                  <option value="">All Sizes</option>
-                  <option value="Small">Small</option>
-                  <option value="Medium">Medium</option>
-                  <option value="Large">Large</option>
-                </select>
-              </div>
-            </>
-          )}
-
-          {category === 'TOYS' && (
-            <div className="filter-group">
-              <label>Material</label>
-              <select value={filters.material} onChange={(e) => setFilters({ ...filters, material: e.target.value })}>
-                <option value="">All Materials</option>
-                <option value="Rubber">Rubber</option>
-                <option value="Foam">Foam</option>
-                <option value="Rope">Rope</option>
-                <option value="Plush">Plush</option>
-              </select>
-            </div>
-          )}
-
           <div className="filter-group">
-            <label>Brand</label>
+            <label>Max Price</label>
             <input
-              type="text"
-              placeholder="Enter brand name"
-              value={filters.brand}
-              onChange={(e) => setFilters({ ...filters, brand: e.target.value })}
+              type="number"
+              placeholder="Max Price"
+              value={filters.maxPrice}
+              onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
             />
           </div>
 
@@ -273,6 +219,11 @@ export default function Store() {
                   />
                 ) : (
                   <div className="no-image">📦</div>
+                )}
+                {product.salesCount && product.salesCount > 50 && (
+                  <span className="trending-badge">
+                    🔥 Trending
+                  </span>
                 )}
                 {product.discountPrice && (
                   <span className="discount-badge">

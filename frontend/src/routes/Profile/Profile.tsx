@@ -217,9 +217,8 @@ export default function Profile() {
     const badges: Record<string, { label: string; color: string }> = {
       PET_OWNER: { label: 'Pet Owner', color: '#3b82f6' },
       VOLUNTEER: { label: 'Volunteer', color: '#10b981' },
-      NGO: { label: 'NGO/Rescue', color: '#8b5cf6' },
-      VET: { label: 'Veterinarian', color: '#f59e0b' },
-      SERVICE_PROVIDER: { label: 'Service Provider', color: '#ec4899' }
+      SERVICE_PROVIDER: { label: 'Sales Person', color: '#ec4899' },
+      ADMIN: { label: 'Admin', color: '#ef4444' }
     }
     return badges[role] || { label: role, color: '#6b7280' }
   }

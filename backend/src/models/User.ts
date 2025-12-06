@@ -4,7 +4,7 @@ export interface IUser extends Document {
   name: string
   email: string
   passwordHash: string
-  role: 'PET_OWNER' | 'NGO' | 'VET' | 'VOLUNTEER' | 'SERVICE_PROVIDER' | 'ADMIN'
+  role: 'PET_OWNER' | 'VOLUNTEER' | 'SERVICE_PROVIDER' | 'ADMIN'
   phone?: string
   city?: string
   location?: {
@@ -23,7 +23,7 @@ const UserSchema = new Schema<IUser>({
   passwordHash: { type: String, required: true },
   role: { 
     type: String, 
-    enum: ['PET_OWNER', 'NGO', 'VET', 'VOLUNTEER', 'SERVICE_PROVIDER', 'ADMIN'],
+    enum: ['PET_OWNER', 'VOLUNTEER', 'SERVICE_PROVIDER', 'ADMIN'],
     default: 'PET_OWNER'
   },
   phone: String,

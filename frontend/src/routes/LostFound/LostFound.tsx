@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import api from '../../services/api'
 import ImageUpload from '../../components/ImageUpload'
+import { useUserLocation, sortByDistance, calculateDistance } from '../../hooks/useUserLocation'
 import './LostFound.css'
 
 interface LostFoundPet {
@@ -25,6 +26,7 @@ interface LostFoundPet {
 }
 
 export default function LostFound() {
+  const { location: userLocation } = useUserLocation()
   const [pets, setPets] = useState<LostFoundPet[]>([])
   const [filteredPets, setFilteredPets] = useState<LostFoundPet[]>([])
   const [statusFilter, setStatusFilter] = useState<string>('ALL')
@@ -59,8 +61,41 @@ export default function LostFound() {
       filtered = filtered.filter(p => p.petType === petTypeFilter)
     }
 
+    // Filter within 60km and sort by distance from user location
+    if (userLocation && !userLocation.error) {
+      filtered = [...filtered]
+        .filter(pet => {
+          if (!pet.lastSeenLocation?.coordinates) return false
+          const distance = calculateDistance(
+            userLocation.latitude,
+            userLocation.longitude,
+            pet.lastSeenLocation.coordinates[1],
+            pet.lastSeenLocation.coordinates[0]
+          )
+          return distance <= 60 // Only show within 60km
+        })
+        .sort((a, b) => {
+          if (!a.lastSeenLocation?.coordinates || !b.lastSeenLocation?.coordinates) return 0
+          
+          const distA = calculateDistance(
+            userLocation.latitude,
+            userLocation.longitude,
+            a.lastSeenLocation.coordinates[1],
+            a.lastSeenLocation.coordinates[0]
+          )
+          const distB = calculateDistance(
+            userLocation.latitude,
+            userLocation.longitude,
+            b.lastSeenLocation.coordinates[1],
+            b.lastSeenLocation.coordinates[0]
+          )
+          
+          return distA - distB
+        })
+    }
+
     setFilteredPets(filtered)
-  }, [pets, statusFilter, petTypeFilter])
+  }, [pets, statusFilter, petTypeFilter, userLocation])
 
   const fetchPets = async () => {
     setLoading(true)
@@ -302,6 +337,14 @@ export default function LostFound() {
                 <p><strong>Description:</strong> {pet.description}</p>
                 {pet.uniqueMarks && <p><strong>Unique Marks:</strong> {pet.uniqueMarks}</p>}
                 <p><strong>Last Seen:</strong> {new Date(pet.lastSeenTime).toLocaleString()}</p>
+                {userLocation && !userLocation.error && pet.lastSeenLocation?.coordinates && (
+                  <p><strong>📍 Distance:</strong> {calculateDistance(
+                    userLocation.latitude,
+                    userLocation.longitude,
+                    pet.lastSeenLocation.coordinates[1],
+                    pet.lastSeenLocation.coordinates[0]
+                  ).toFixed(1)} km away</p>
+                )}
                 <p><strong>Reported by:</strong> {pet.ownerId?.name}</p>
                 {pet.ownerId?.phone && (
                   <p><strong>Contact:</strong> {pet.ownerId.phone}</p>

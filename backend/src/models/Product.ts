@@ -39,6 +39,7 @@ export interface IProduct extends Document {
   isBestseller: boolean
   isNewArrival: boolean
   isFeatured: boolean
+  salesCount: number
   tags: string[]
   subscriptionAvailable: boolean
   subscriptionDiscount?: number
@@ -89,6 +90,7 @@ const ProductSchema = new Schema<IProduct>({
   isBestseller: { type: Boolean, default: false },
   isNewArrival: { type: Boolean, default: false },
   isFeatured: { type: Boolean, default: false },
+  salesCount: { type: Number, default: 0 },
   tags: [String],
   subscriptionAvailable: { type: Boolean, default: false },
   subscriptionDiscount: Number

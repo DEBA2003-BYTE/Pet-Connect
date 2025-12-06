@@ -145,10 +145,9 @@ export default function Signup() {
               disabled={loading}
             >
               <option value="PET_OWNER">Pet Owner</option>
-              <option value="VOLUNTEER">Volunteer</option>
-              <option value="NGO">NGO/Rescue Organization</option>
-              <option value="VET">Veterinarian</option>
-              <option value="SERVICE_PROVIDER">Service Provider</option>
+              <option value="VOLUNTEER">Volunteer (Can resolve rescues)</option>
+              <option value="SERVICE_PROVIDER">Sales Person (Can sell products)</option>
+              <option value="ADMIN">Admin (Full system access)</option>
             </select>
           </div>
 

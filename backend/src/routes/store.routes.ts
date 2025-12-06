@@ -62,6 +62,9 @@ router.get('/products', async (req, res) => {
       case 'bestseller':
         sortOption = { isBestseller: -1, 'ratings.count': -1 }
         break
+      case 'trending':
+        sortOption = { salesCount: -1, 'ratings.count': -1 }
+        break
       case 'newest':
         sortOption = { createdAt: -1 }
         break
@@ -115,6 +118,49 @@ router.post('/products', authMiddleware, async (req: AuthRequest, res) => {
     })
 
     res.status(201).json(product)
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error })
+  }
+})
+
+// Get seller's own products
+router.get('/my-products', authMiddleware, async (req: AuthRequest, res) => {
+  try {
+    const products = await Product.find({ sellerId: req.userId }).sort({ createdAt: -1 })
+    res.json(products)
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error })
+  }
+})
+
+// Update product (seller only)
+router.patch('/products/:id', authMiddleware, async (req: AuthRequest, res) => {
+  try {
+    const product = await Product.findOne({ _id: req.params.id, sellerId: req.userId })
+    
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found or unauthorized' })
+    }
+
+    Object.assign(product, req.body)
+    await product.save()
+
+    res.json(product)
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error })
+  }
+})
+
+// Delete product (seller only)
+router.delete('/products/:id', authMiddleware, async (req: AuthRequest, res) => {
+  try {
+    const product = await Product.findOneAndDelete({ _id: req.params.id, sellerId: req.userId })
+    
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found or unauthorized' })
+    }
+
+    res.json({ message: 'Product deleted successfully' })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error })
   }

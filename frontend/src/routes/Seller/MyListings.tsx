@@ -35,14 +35,15 @@ export default function MyListings() {
     setLoading(true)
     try {
       // Fetch seller's products
-      const { data: productsData } = await api.get('/store/products?sellerId=me')
-      setProducts(productsData.products || [])
+      const { data: productsData } = await api.get('/store/my-products')
+      setProducts(productsData || [])
 
       // Fetch seller's services
       const { data: servicesData } = await api.get('/services/my-services')
       setServices(servicesData || [])
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch listings', error)
+      console.error('Error details:', error.response?.data)
     } finally {
       setLoading(false)
     }
@@ -67,6 +68,18 @@ export default function MyListings() {
       fetchListings()
     } catch (error: any) {
       alert(error.response?.data?.message || 'Failed to delete product')
+    }
+  }
+
+  const handleDeleteService = async (serviceId: string) => {
+    if (!confirm('Are you sure you want to delete this service?')) return
+
+    try {
+      await api.delete(`/services/${serviceId}`)
+      alert('Service deleted!')
+      fetchListings()
+    } catch (error: any) {
+      alert(error.response?.data?.message || 'Failed to delete service')
     }
   }
 
@@ -170,6 +183,15 @@ export default function MyListings() {
                     {service.isVerified && (
                       <span className="verified-badge">✓ Verified</span>
                     )}
+                  </div>
+
+                  <div className="listing-actions">
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleDeleteService(service._id)}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
               ))}

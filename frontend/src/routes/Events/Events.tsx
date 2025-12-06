@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import api from '../../services/api'
 import ImageUpload from '../../components/ImageUpload'
+import { useUserLocation, sortByDistance, calculateDistance } from '../../hooks/useUserLocation'
 import './Events.css'
 
 interface User {
@@ -50,6 +51,7 @@ interface Pet {
 }
 
 export default function Events() {
+  const { location: gpsLocation } = useUserLocation()
   const [events, setEvents] = useState<Event[]>([])
   const [myPets, setMyPets] = useState<Pet[]>([])
   const [loading, setLoading] = useState(true)
@@ -220,12 +222,17 @@ export default function Events() {
     })
   }
 
-  const filteredEvents = events.filter(event => {
+  let filteredEvents = events.filter(event => {
     const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          event.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          event.address.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesSearch
   })
+
+  // Filter within 60km and sort by distance from user location
+  if (gpsLocation && !gpsLocation.error) {
+    filteredEvents = sortByDistance(filteredEvents, gpsLocation.latitude, gpsLocation.longitude, 60)
+  }
 
   return (
     <div className="events-container">
@@ -527,6 +534,17 @@ export default function Events() {
                     <span className="icon">📍</span>
                     <span>{event.venue}, {event.address}</span>
                   </div>
+                  {gpsLocation && !gpsLocation.error && event.location?.coordinates && (
+                    <div className="detail-item">
+                      <span className="icon">🚗</span>
+                      <span>{calculateDistance(
+                        gpsLocation.latitude,
+                        gpsLocation.longitude,
+                        event.location.coordinates[1],
+                        event.location.coordinates[0]
+                      ).toFixed(1)} km away</span>
+                    </div>
+                  )}
                   <div className="detail-item">
                     <span className="icon">👥</span>
                     <span>
