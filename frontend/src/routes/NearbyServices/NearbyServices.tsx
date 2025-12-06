@@ -149,7 +149,7 @@ export default function NearbyServices() {
           address: tags['addr:full'] || 
                    `${tags['addr:street'] || ''} ${tags['addr:housenumber'] || ''}`.trim() ||
                    tags['addr:city'] || 
-                   'Address not available',
+                   undefined,
           phone: tags.phone || tags['contact:phone'],
           website: tags.website || tags['contact:website'],
           isVerified: false,

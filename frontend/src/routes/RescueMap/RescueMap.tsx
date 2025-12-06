@@ -4,7 +4,7 @@ import 'leaflet/dist/leaflet.css'
 import api from '../../services/api'
 import ImageUpload from '../../components/ImageUpload'
 import { useAuth } from '../../context/AuthContext'
-import { useUserLocation, sortByDistance } from '../../hooks/useUserLocation'
+import { useUserLocation, sortByDistance, calculateDistance as calcDist } from '../../hooks/useUserLocation'
 import './RescueMap.css'
 
 interface RescueReport {
@@ -483,8 +483,90 @@ export default function RescueMap() {
           </form>
         )}
 
+        {/* Nearby Rescues Section - Top 6 within 60km */}
+        {gpsLocation && !gpsLocation.error && rescues.length > 0 && (
+          <div className="nearby-rescues-section">
+            <h3>🚨 Nearby Rescues (6)</h3>
+            <p className="section-subtitle">Closest rescues within 60km, sorted by distance</p>
+            <div className="nearby-rescues-grid">
+              {rescues
+                .filter(rescue => {
+                  const distance = calcDist(
+                    gpsLocation.latitude,
+                    gpsLocation.longitude,
+                    rescue.location.coordinates[1],
+                    rescue.location.coordinates[0]
+                  )
+                  return distance <= 60
+                })
+                .sort((a, b) => {
+                  const distA = calcDist(
+                    gpsLocation.latitude,
+                    gpsLocation.longitude,
+                    a.location.coordinates[1],
+                    a.location.coordinates[0]
+                  )
+                  const distB = calcDist(
+                    gpsLocation.latitude,
+                    gpsLocation.longitude,
+                    b.location.coordinates[1],
+                    b.location.coordinates[0]
+                  )
+                  return distA - distB
+                })
+                .slice(0, 6)
+                .map((rescue) => {
+                  const distance = calcDist(
+                    gpsLocation.latitude,
+                    gpsLocation.longitude,
+                    rescue.location.coordinates[1],
+                    rescue.location.coordinates[0]
+                  )
+                  return (
+                    <div key={rescue._id} className="nearby-rescue-card">
+                      <div className="nearby-rescue-header">
+                        <span className="case-number">#{rescue.caseNumber}</span>
+                        <span className="distance-badge">📍 {distance.toFixed(1)} km</span>
+                      </div>
+                      
+                      <div className="nearby-rescue-content">
+                        <div className="animal-severity">
+                          <span className="animal-type">{rescue.animalType}</span>
+                          <span className={`severity-badge severity-${rescue.severity.toLowerCase()}`}>
+                            {rescue.severity === 'SEVERE' && '🔴'}
+                            {rescue.severity === 'MODERATE' && '🟡'}
+                            {rescue.severity === 'MINOR' && '🟢'}
+                          </span>
+                        </div>
+                        
+                        <p className="injury-brief">{rescue.injuryDescription.substring(0, 80)}...</p>
+                        
+                        {(rescue.safetyWarnings.isAggressive || rescue.safetyWarnings.onRoad || rescue.safetyWarnings.isBleeding) && (
+                          <div className="safety-warnings-compact">
+                            {rescue.safetyWarnings.isAggressive && <span>⚠️</span>}
+                            {rescue.safetyWarnings.onRoad && <span>🚗</span>}
+                            {rescue.safetyWarnings.isBleeding && <span>🩸</span>}
+                          </div>
+                        )}
+                        
+                        <div className="nearby-rescue-footer">
+                          <span className={`status-badge status-${rescue.status.toLowerCase()}`}>
+                            {rescue.status}
+                          </span>
+                          <span className="time-ago">
+                            {new Date(rescue.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+            </div>
+          </div>
+        )}
+
         <div className="rescue-list">
-          <h3>Nearby Rescues ({rescues.length})</h3>
+          <h3>All Rescues ({rescues.length})</h3>
           <div className="rescue-items">
             {rescues.map((rescue) => (
               <div key={rescue._id} className="rescue-item">

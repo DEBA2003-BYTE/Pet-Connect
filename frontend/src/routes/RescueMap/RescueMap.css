@@ -412,3 +412,146 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
 }
+
+/* Nearby Rescues Section */
+.nearby-rescues-section {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-bottom: 2px solid #5a67d8;
+}
+
+.nearby-rescues-section h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  color: white;
+}
+
+.section-subtitle {
+  margin: 0 0 1rem 0;
+  font-size: 0.875rem;
+  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.nearby-rescues-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.nearby-rescue-card {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.nearby-rescue-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.nearby-rescue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.nearby-rescue-header .case-number {
+  font-weight: 600;
+  color: #667eea;
+  font-size: 0.875rem;
+}
+
+.distance-badge {
+  background: #10b981;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.nearby-rescue-content {
+  color: #1f2937;
+}
+
+.animal-severity {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.animal-severity .animal-type {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.875rem;
+}
+
+.animal-severity .severity-badge {
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.injury-brief {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0.5rem 0;
+  line-height: 1.4;
+}
+
+.safety-warnings-compact {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+}
+
+.nearby-rescue-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.nearby-rescue-footer .status-badge {
+  font-size: 0.625rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.status-open {
+  background: #ef4444;
+  color: white;
+}
+
+.status-badge.status-in_progress {
+  background: #f59e0b;
+  color: white;
+}
+
+.status-badge.status-resolved {
+  background: #10b981;
+  color: white;
+}
+
+.time-ago {
+  font-size: 0.625rem;
+  color: #9ca3af;
+}
+
+@media (max-width: 768px) {
+  .nearby-rescues-grid {
+    grid-template-columns: 1fr;
+  }
+}
